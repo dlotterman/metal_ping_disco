@@ -52,4 +52,4 @@ Once the container has been instantiated with the environment variables, it can 
 
 It can be added to cron to run every 5 minutes:
 
-`*/5 *   * * *   root docker restart metal_ping_disco_data_runner` | sudo tee -a /etc/crontab
+`echo "*/5 *   * * *   root docker restart metal_ping_disco_data_runner" | sudo tee -a /etc/crontab`
