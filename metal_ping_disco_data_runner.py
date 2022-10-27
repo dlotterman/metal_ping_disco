@@ -68,3 +68,20 @@ def metal_ping_disco():
 
 if __name__ == "__main__":
     metal_ping_disco()
+
+
+### Docs:
+
+# The python line endpoint_latency = str(ping_output.stdout).split('/')[3].split('=')[1].lstrip()
+# Takes the below output from a shell ping command:
+# b'PING 136.144.56.179 (136.144.56.179) 56(84) bytes of data.\n64 bytes from 136.144.56.179: icmp_seq=1 ttl=63 time=71.7
+# ms\n\n--- 136.144.56.179 ping statistics ---\n1 packets transmitted, 1 received, 0% packet loss, time 0ms\nrtt min/avg/m
+# ax/mdev = 71.708/71.708/71.708/0.000 ms\n'
+
+# and isolates it to the string:
+# 73.088
+
+# The reason why we use subprocess / shell's ping is that most distro's implement a setuid on the ping binary that allows
+# non-root users to execute it. Otherwise tooling in python that creates ICMP traffic needs root privs to do so because
+# python does not replicate that setuid behavior and replicating it would be burdensome. Running a container as root is bad
+# so we do a slightly less bad thing and shell out from python so we can do the needful with minimal privs
