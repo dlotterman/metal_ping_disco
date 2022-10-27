@@ -26,7 +26,7 @@ Both [metal_ping_disco](https://hub.docker.com/repository/docker/dlotterman/meta
 Environment Specific Steps:
 - [Docker](docs/docker.md)
 - [Podman](docs/podman.md)
-- [Kubernetes](docs/k8s.mdM)
+- [Kubernetes](docs/k8s.md)
 - *Coming soon - systemd*
 
 ### Credentials

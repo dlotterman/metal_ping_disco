@@ -64,7 +64,9 @@ sudo podman run -d --name metal_ping_disco_data_runner \
 -e METAL_PING_DISCO_AWS_S3_ENDPOINT=$METAL_PING_DISCO_AWS_S3_ENDPOINT \
 dlotterman/metal_ping_disco_data_runner
 ```
-Once the container has been instantiated with the environment variables, it can be re-run as needed with just `sudo podman restart metal_ping_disco_data_runner`.
+Once the container has been instantiated with the environment variables, it can be re-run as needed with just 
+
+`sudo podman restart metal_ping_disco_data_runner`.
 
 It can be added to cron to run every 5 minutes:
 

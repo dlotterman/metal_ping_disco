@@ -48,7 +48,9 @@ sudo docker run -d --name metal_ping_disco_data_runner \
 dlotterman/metal_ping_disco_data_runner
 ```
 
-Once the container has been instantiated with the environment variables, it can be re-run as needed with just `sudo docker restart metal_ping_disco_data_runner`.
+Once the container has been instantiated with the environment variables, it can be re-run as needed with just 
+
+`sudo docker restart metal_ping_disco_data_runner`.
 
 It can be added to cron to run every 5 minutes:
 
