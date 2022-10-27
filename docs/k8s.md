@@ -43,7 +43,7 @@ The pod will also need to be exposed to a public network. This step is so k8's d
 
 ## metal_ping_disco_data_runner
 
-The `data_runner` app is intended to be run as a scheduled task, in Kubernetes this is easiest with a Kubernetes CronJob:
+The `data_runner` app is intended to be run as a scheduled task, in Kubernetes this is easiest with a [Kubernetes CronJob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/):
 
 ```
 apiVersion: batch/v1

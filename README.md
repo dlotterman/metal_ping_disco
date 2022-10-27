@@ -8,7 +8,7 @@
 ![](https://s3.us-east-1.wasabisys.com/metalstaticassets/metal_ping_disco.JPG)
 
 `metal_ping_disco` is really two little applications:
-* `metal_ping_disco.py` is meant to be a stateless but long-lived HTTP / browser reachable endpoint that loads data from s3 (collected by `data_runner`, and graphs it.
+* `metal_ping_disco.py` is meant to be a stateless but long-lived HTTP / browser reachable endpoint that loads data from s3 (collected by `data_runner`), and graphs it.
 * `metal_ping_disco_data_runner.py` is meant to be a scheduled taks (cronjob) that when run, will load the previous runs dataset (if not found, create) and then ping a collection of endpoints, mangle the data into `.csv`, and then store that file back to s3. 
 
 If this looks useful, you likely really want a real production ready tool such as:

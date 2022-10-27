@@ -13,9 +13,7 @@ import dash_bootstrap_components as dbc
 
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s %(message)s",
-    datefmt="%Y-%m-%dT%H:%M:%S%z"
+    level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%Y-%m-%dT%H:%M:%S%z"
 )
 
 AWS_S3_BUCKET = os.getenv("METAL_PING_DISCO_AWS_S3_BUCKET")
@@ -35,7 +33,11 @@ navbar = dbc.Navbar(
                 dbc.Row(
                     [
                         dbc.Col(html.Img(src=metal_logo, height="30px")),
-                        dbc.Col(dbc.NavbarBrand("Equinix Metal: Ping Disco", className="ms-2")),
+                        dbc.Col(
+                            dbc.NavbarBrand(
+                                "Equinix Metal: Ping Disco", className="ms-2"
+                            )
+                        ),
                     ],
                     align="center",
                     className="g-0",
@@ -45,26 +47,32 @@ navbar = dbc.Navbar(
             ),
         ]
     ),
-
 )
 
 app.layout = html.Div(
-    html.Div([
-        navbar,
-        dcc.Graph(id='metal_ping_disco', animate=True),
-        dcc.Interval(id='interval-component',  interval=10*1000, n_intervals=0),
-        dcc.Markdown('''
+    html.Div(
+        [
+            navbar,
+            dcc.Graph(id="metal_ping_disco", animate=True),
+            dcc.Interval(id="interval-component", interval=10 * 1000, n_intervals=0),
+            dcc.Markdown(
+                """
             - Latencies to various endpoints from an Equinix Metal instance
-        '''),        
-    ])
+        """
+            ),
+        ]
+    )
 )
 
-@app.callback(Output('metal_ping_disco', 'figure'), Input('interval-component', 'n_intervals'))
+
+@app.callback(
+    Output("metal_ping_disco", "figure"), Input("interval-component", "n_intervals")
+)
 def update_graph_live(n):
     try:
         network_data = pd.read_csv(
             "s3://{}/metal_ping_disco_network_data.csv".format(AWS_S3_BUCKET),
-            storage_options = {
+            storage_options={
                 "key": AWS_ACCESS_KEY_ID,
                 "secret": AWS_SECRET_ACCESS_KEY,
                 "client_kwargs": {
@@ -73,13 +81,15 @@ def update_graph_live(n):
             },
         )
     except:
-        logging.exception('Fatal error interacting with s3, exiting')
+        logging.exception("Fatal error interacting with s3, exiting")
         sys.exit(1)
 
-    fig = px.line(network_data, x='time',y='latency', color='ip', symbol='ip', template='ggplot2')
+    fig = px.line(
+        network_data, x="time", y="latency", color="ip", symbol="ip", template="ggplot2"
+    )
 
     return fig
 
 
 if __name__ == "__main__":
-    app.run_server(host='0.0.0.0')
+    app.run_server(host="0.0.0.0")
