@@ -98,8 +98,9 @@ def metal_ping_disco():
                 toc = time.perf_counter()
                 connection.close()
                 latency = time.time() - tic
-        except Error as e:
-            logging.error('Error connecting to %s mysql endpoint', mysql_endpoint)
+        except Exception as e:
+            logging.error('Error %s connecting to %s mysql endpoint', e, mysql_endpoint)
+            logging.error(traceback.format_exc())
         finally:
             logging.info('%s latency time is %.4f', mysql_endpoint, latency)
             network_data_collected = pd.DataFrame(
