@@ -5,7 +5,7 @@ import logging
 import os
 import sys
 import time
-
+import traceback
 import pandas as pd
 
 import mysql.connector as mysqldb
