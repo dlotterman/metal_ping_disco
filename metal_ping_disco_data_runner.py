@@ -8,7 +8,10 @@ import time
 import traceback
 import pandas as pd
 
+import sys
+
 import mysql.connector as mysqldb
+import oracledb
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%Y-%m-%dT%H:%M:%S%z"
@@ -19,8 +22,12 @@ AWS_ACCESS_KEY_ID = os.getenv("METAL_PING_DISCO_AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("METAL_PING_DISCO_AWS_SECRET_ACCESS_KEY")
 AWS_S3_ENDPOINT = os.getenv("METAL_PING_DISCO_AWS_S3_ENDPOINT")
 MYSQL_ENDPOINTS_RAW = os.getenv("METAL_PING_DISCO_MYSQL_ENDPOINTS_RAW")
+ORACLE_ENDPOINTS_RAW = os.getenv("METAL_PING_DISCO_ORACLE_ENDPOINTS_RAW")
 
 MYSQL_ENDPOINTS = [
+]
+
+ORACLE_ENDPOINTS = [
 ]
 
 endpoints = [
@@ -37,12 +44,26 @@ endpoints = [
 
 def process_mysql_endpoints():
 
+    if not MYSQL_ENDPOINTS_RAW:
+        return
     for ENDPOINT in MYSQL_ENDPOINTS_RAW.split(','):
+        if not ENDPOINT:
+            continue    
         MYSQL_ENDPOINTS.append(ENDPOINT)
+
+def process_oracle_endpoints():
+
+    if not ORACLE_ENDPOINTS_RAW:
+        return    
+    for ENDPOINT in ORACLE_ENDPOINTS_RAW.split(','):
+        if not ENDPOINT:
+            continue
+        ORACLE_ENDPOINTS.append(ENDPOINT)        
 
 def metal_ping_disco():
     logging.info("starting metal_ping_disco data collection")
     process_mysql_endpoints()
+    process_oracle_endpoints()
 
     try:
         network_data = pd.read_csv(
@@ -109,6 +130,36 @@ def metal_ping_disco():
             network_data = pd.concat(
                 [network_data, network_data_collected], ignore_index=True
             )          
+            
+    for oracle_endpoint in ORACLE_ENDPOINTS:
+        name = oracle_endpoint.split(':')[0]
+        dsn = oracle_endpoint.split(':')[1]
+        port = oracle_endpoint.split(':')[2]
+        username = oracle_endpoint.split(':')[3]
+        password = oracle_endpoint.split(':')[4]
+        tic = time.time()
+        try:
+            connection = oracledb.connect(
+                user=username,
+                password=password,
+                port=port,
+                dsn=dsn)
+            if connection.is_healthy():
+                dbinfo = connection.ping()
+                toc = time.perf_counter()
+                connection.close()
+                latency = time.time() - tic
+        except Exception as e:
+            logging.error('Error %s connecting to %s oracle endpoint', e, oracle_endpoint)
+            logging.error(traceback.format_exc())
+        finally:
+            logging.info('%s latency time is %.4f', oracle_endpoint, latency)
+            network_data_collected = pd.DataFrame(
+                [[name, ts, endpoint_latency]], columns=["ip", "time", "latency"]
+            )
+            network_data = pd.concat(
+                [network_data, network_data_collected], ignore_index=True
+            )             
 
     network_data.to_csv(
         "s3://{}/metal_ping_disco_network_data.csv".format(AWS_S3_BUCKET),

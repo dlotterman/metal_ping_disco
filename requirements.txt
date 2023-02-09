@@ -41,3 +41,4 @@ wrapt<=1.14.1
 yarl<=1.8.1
 zipp<=3.9.0
 mysql-connector-python
+oracledb
