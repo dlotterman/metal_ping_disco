@@ -42,9 +42,31 @@ export METAL_PING_DISCO_AWS_S3_ENDPOINT=
 
 These set the s3 endpoint (and provider), bucket name and credentials both applications will use. Note that the s3 provider does not need to be AWS s3 itself, just s3 protocol compliant. 
 
+#### Ping Monitoring
+By default, Ping Disco will default to a handful of ICMP reachable endpoints. To specify your own, set the following environment variable:
+```
+export METAL_PING_DISCO_PING_ENDPOINTS_RAW="metal_sv15:136.144.55.31,metal_fr2:145.40.93.77,metal_dfw2:139.178.82.17" && \
+```
+
+Where
+	- `metal_sv15` will be the name of the graph legend for the edpoint, and `136.144.55.31` is the IP address of the endpoint to ping. DNS names *should* work fine.
+
+#### MySQL Monitoring
 Optionally, set:
-`export METAL_PING_DISCO_MYSQL_ENDPOINTS_RAW="haha_db:127.0.0.1:3306:disco_user:disco_Pass:disco_db,haha_db2:127.0.0.2:3306:disco_user:disco_Pass:disco_db"`
+```
+export METAL_PING_DISCO_MYSQL_ENDPOINTS_RAW="haha_db:127.0.0.1:3306:disco_user:disco_Pass:disco_db,haha_db2:127.0.0.2:3306:disco_user:disco_Pass:disco_db"
+```
 
 This will enable tell the container to make a MySQL query and measure the latency for:
-	* `127.0.0.1` on port `3306` with the user `disco_user` with the password `disco_Pass`, where the line on the graph and legend will be `haha_db`, and then all the same for `haha_db2` on IP `127.0.0.2`.
-	* Values for each mysql instance are colon seperated, mysql instances themselves are comma seperated.
+	- `127.0.0.1` on port `3306` with the user `disco_user` with the password `disco_Pass`, where the line on the graph and legend will be `haha_db`, and then all the same for `haha_db2` on IP `127.0.0.2`.
+	- Values for each mysql instance are colon seperated, mysql instances themselves are comma seperated.
+	
+#### Oracle Monitoring:
+Optionally, set:
+```
+export METAL_PING_DISCO_ORACLE_ENDPOINTS_RAW="oracle_db:139.178.94.137/xe:1521:oracle_user:oracle_pass,"
+```
+
+This will enable tell the container to make a OracleDB query and measure the latency for:
+	- `139.178.94.137` on port `1521` with the user `oracle_user` with the password `oracle_pass`, where the line on the graph and legend will be `oracle_db`
+	- Values for each oracle instance are colon seperated, oracle instances themselves are comma seperated.

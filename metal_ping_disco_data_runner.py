@@ -14,33 +14,34 @@ import mysql.connector as mysqldb
 import oracledb
 
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%Y-%m-%dT%H:%M:%S%z"
+    level=logging.INFO, format="%(asctime)s %(levelname)-8s %(message)s", datefmt="%Y-%m-%dT%H:%M:%S%z"
 )
 
 AWS_S3_BUCKET = os.getenv("METAL_PING_DISCO_AWS_S3_BUCKET")
 AWS_ACCESS_KEY_ID = os.getenv("METAL_PING_DISCO_AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("METAL_PING_DISCO_AWS_SECRET_ACCESS_KEY")
 AWS_S3_ENDPOINT = os.getenv("METAL_PING_DISCO_AWS_S3_ENDPOINT")
+PING_ENDPOINTS_RAW = os.getenv("METAL_PING_DISCO_PING_ENDPOINTS_RAW")
 MYSQL_ENDPOINTS_RAW = os.getenv("METAL_PING_DISCO_MYSQL_ENDPOINTS_RAW")
 ORACLE_ENDPOINTS_RAW = os.getenv("METAL_PING_DISCO_ORACLE_ENDPOINTS_RAW")
 
-MYSQL_ENDPOINTS = [
-]
+MYSQL_ENDPOINTS = []
 
-ORACLE_ENDPOINTS = [
-]
+ORACLE_ENDPOINTS = []
 
-endpoints = [
-    "metal_dc13:136.144.56.179",
-    "metal_hk2:145.40.125.17",
-    "metal_sk2:147.28.173.3",
-    "metal_ch3:145.40.75.3",
-    "metal_am6:147.75.87.3",
-    "aws_us_west1:13.56.63.251",
-    "aws_us_east1:3.208.0.0",
-    "aws_us_central1:3.120.0.0",
-    "opendns:208.67.222.222",
-]
+PING_ENDPOINTS = []
+
+def process_ping_endpoints():
+    if not PING_ENDPOINTS_RAW:
+        PING_ENDPOINTS.append("metal_dc13:136.144.56.179")
+        PING_ENDPOINTS.append("metal_hk2:145.40.125.17")
+        PING_ENDPOINTS.append("metal_am6:147.75.87.3")
+        PING_ENDPOINTS.append("aws_us_west1:13.56.63.251")
+        return
+    for ENDPOINT in PING_ENDPOINTS_RAW.split(','):
+        if not ENDPOINT:
+            continue    
+        PING_ENDPOINTS.append(ENDPOINT)
 
 def process_mysql_endpoints():
 
@@ -62,6 +63,7 @@ def process_oracle_endpoints():
 
 def metal_ping_disco():
     logging.info("starting metal_ping_disco data collection")
+    process_ping_endpoints()
     process_mysql_endpoints()
     process_oracle_endpoints()
 
@@ -87,7 +89,7 @@ def metal_ping_disco():
         sys.exit(1)
 
     ts = datetime.datetime.now(datetime.timezone.utc).isoformat()
-    for endpoint in endpoints:
+    for endpoint in PING_ENDPOINTS:
         ping_output = subprocess.run(
             ["ping", endpoint.split(":")[1], "-c", "1", "-w", "2"],
             timeout=10,
